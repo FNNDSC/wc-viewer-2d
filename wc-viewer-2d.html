@@ -179,7 +179,10 @@
 
     </style>
 
-    <chips-api id="API"></chips-api>
+    <chips-api
+      id="API"
+      api="ultron"
+     ></chips-api>
 
     <div class="container" on-mouseenter="_showControls" on-mouseleave="_hideControls">
       <div hidden$=[[!empty]] class="overlay"> &lt; empty /&gt; </div>
@@ -408,6 +411,10 @@
             type: String,
             value: '',
           },
+          api: {
+            type: Object,
+            value: {},
+          },
         };
       }
 
@@ -608,16 +615,17 @@
             this.windowWidth = this.stackHelper.stack.windowWidth;
             this.minMax = this.stackHelper.stack.minMax;
 
-            const histogram = new Array(1 + this.minMax[1] - this.minMax[0]);
+            const histogram = new Array(Math.round(1 + this.minMax[1] - this.minMax[0]));
+
             const slope = this.stackHelper.stack.rescaleSlope;
             const intercept = this.stackHelper.stack.rescaleIntercept;
             for (let i = 0; i < this.stackHelper.stack.frame.length; i++) {
               const frame = this.stackHelper.stack.frame[i];
               for (let j = 0; j < frame.pixelData.length; j++) {
-                const value = AMI.UtilsCore.rescaleSlopeIntercept(
+                const value = Math.round(AMI.UtilsCore.rescaleSlopeIntercept(
                   frame.pixelData[j],
                   slope,
-                  intercept)
+                  intercept))
                 ;
                 if (histogram[value] === undefined) {
                   histogram[value] = 0;
@@ -659,17 +667,27 @@
         const dataAPI = {};
         dataAPI.auth = {
           type: 'token',
-          token: sessionStorage.getItem('token'),
+          token: this.api.token,
         };
+        this.$.API.apiRoot = this.api.apiRoot;
         this.$.API.handleAs = 'arraybuffer';
-        return this.$.API.request( 'GET', url, dataAPI );
+        return this.$.API.request( 'GET', url, dataAPI ).
+        then((response) => {
+          return response;
+        });
       }
 
       _loadUrl(url) {
         const loader = new AMI.VolumeLoader();
+        let fetcher = null;
+        console.log(this.api);
+        if (!this.api.apiRoot) {
+          fetcher = fetch(url).then((response) => response.arrayBuffer())
+        } else {
+          fetcher = this._fetchUrl(url);
+        }
 
-        return fetch(url)
-          .then((response) => response.arrayBuffer())
+        return fetcher
           .then((arrayBuffer) => {
             this.imagesLoaded += 1;
             return loader.parse({
