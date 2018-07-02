@@ -48,13 +48,6 @@
         overflow: hidden;
       }
 
-      .container > div.overlay2 {
-        justify-content: inherit;
-        align-items: inherit;
-        display: flex;
-        flex-direction: column;
-      }
-
       .renderer-container {
         flex-direction: column;
         border: 2px solid rgba(0, 0, 0, 0);
@@ -145,7 +138,7 @@
         z-index: 2;
       }
 
-      .overlay.drag, .overlay2.drag {
+      .overlay.drag {
         background-color: rgba(0, 0, 0, 0.8);
         z-index: 3;
       }
@@ -157,21 +150,7 @@
 
       .drag > div {
         padding: 45px;
-        border: 2px dashed var(--accent-color);
-      }
-
-      .overlay2 > div {
-        flex: 1;
-        margin: 4px;
-        padding: 0;
-        border: 2px dashed var(--accent-color);
-        justify-content: center;
-        align-items: center;
-        display: flex;
-      }
-
-      .overlay2 > div:hover {
-        background-color: grey;
+        border: 5px dashed var(--accent-color);
       }
 
       paper-slider {
@@ -207,12 +186,8 @@
 
     <div class="container" on-mouseenter="_showControls" on-mouseleave="_hideControls">
       <div hidden$=[[!empty]] class="overlay"> &lt; empty /&gt; </div>
-      <div hidden$=[[!_showNoOverlaysDrag(overlays,drag)]] class="overlay drag">
+      <div hidden$=[[!drag]] class="overlay drag">
         <div> Drop data! </div>
-      </div>
-      <div hidden$=[[!_showOverlaysDrag(overlays,drag)]] class="overlay2 drag">
-        <div>Base</div>
-        <div>Overlay</div>
       </div>
       <div hidden$=[[!loading]] class="overlay opaque"> Loading images ([[imagesLoaded]]/[[imagesTotal]]) </div>
       <div hidden$=[[!loaded]] class$="renderer-container {{_isLinked(linked)}}"> 
@@ -261,22 +236,6 @@
               <paper-icon-button icon$="{{_fullscreenIcon(fullscreen)}}" on-tap="_toggleFullscren"></paper-icon-button>
               <paper-icon-button icon="icons:clear" on-tap="_clear"></paper-icon-button>            
             </div>
-            <div class="toolbar-controls">
-              <paper-icon-button icon$="{{_playIcon(play)}}" on-tap="_togglePlay"></paper-icon-button>
-              [[index]] / [[indexMax]]
-              <div class="spacer"></div>
-              <paper-menu-button vertical-align="bottom">
-                <paper-icon-button icon="av:subtitles" slot="dropdown-trigger" alt="menu"></paper-icon-button>
-                <paper-listbox slot="dropdown-content" selected="{{annotations}}">
-                  <paper-item>none</paper-item>
-                  <paper-item>basic</paper-item>
-                  <paper-item>full</paper-item>
-                </paper-listbox>
-              </paper-menu-button>
-              <paper-icon-button class$="{{_isLinked(linked)}}" icon="icons:link" on-tap="_toggleLinked"></paper-icon-button>                        
-              <paper-icon-button icon$="{{_fullscreenIcon(fullscreen)}}" on-tap="_toggleFullscren"></paper-icon-button>
-              <paper-icon-button icon="icons:clear" on-tap="_clear"></paper-icon-button>            
-            </div>
           </div>
       </div>
     </div>
@@ -292,10 +251,6 @@
       static get properties() {
         return {
           active: {
-            type: Boolean,
-            value: false,
-          },
-          overlays: {
             type: Boolean,
             value: false,
           },
@@ -561,7 +516,7 @@
               detail: {},
             }
           );
-
+          window.console.log('activate changed');
           this.dispatchEvent(activateRenderer);
           this.activate = false;
         }
@@ -949,14 +904,6 @@
         } else {
           return 'icons:code';
         }
-      }
-
-      _showOverlaysDrag(overlays, drag) {
-        return overlays && drag;
-      }
-
-      _showNoOverlaysDrag(overlays, drag) {
-        return (!overlays) && drag;
       }
     }
     window.customElements.define(WcViewer2d.is, WcViewer2d);
