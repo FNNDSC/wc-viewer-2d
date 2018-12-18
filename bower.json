@@ -11,7 +11,7 @@
     "paper-slider": "^2.0.6",
     "iron-icons": "^2.1.1",
     "chips-api": "fnndsc/chips-api#master",
-    "ami": "fnndsc/ami#dev",
+    "ami": "fnndsc/ami#master",
     "three.js": "mrdoob/three.js#dev",
     "moment-element": "abdonrd/moment-element#^2.0.0"
   },
